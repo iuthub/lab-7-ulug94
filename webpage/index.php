@@ -1,16 +1,41 @@
-<?php
-include('connection.php');
-?>
+<?php include('connection.php'); ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>My Personal Page</title>
 		<link href="style.css" type="text/css" rel="stylesheet" />
+	<?php 
+	
+		$isPost= $_SERVER["REQUEST_METHOD"]=="POST";
+		$isGet = $_SERVER["REQUEST_METHOD"]=="GET";
+		
+		include("connection.php");
+		session_start();
+		
+		if($isPost){
+			$username=$_POST["username"];
+			$pwd=$_POST["pwd"];
+			$stmt="SELECT fullname from users where username= '$username' AND password='$pwd'";
+			$username1='';
+			$user=$conn->query($stmt);
+			foreach ($user as $username2) {
+				$username1=$username2[0];
+			}
+			
+			$_SESSION["user"]=$user;
+		}
+	 ?>
+
 	</head>
 	
 	<body>
 		<?php include('header.php'); ?>
 		<!-- Show this part if user is not signed in yet -->
+	<?php 
+		if(!isset($_SESSION["user"])){
+	 ?>
+
 		<div class="twocols">
 			<form action="index.php" method="post" class="twocols_col">
 				<ul class="form">
@@ -37,8 +62,14 @@ include('connection.php');
 			</div>
 		</div>
 		
+<?php } 
+else { ?>
 		<!-- Show this part after user signed in successfully -->
 		<div class="logout_panel"><a href="register.php">My Profile</a>&nbsp;|&nbsp;<a href="index.php?logout=1">Log Out</a></div>
+
+
+		
+		<h2>Hello <?=$username1?> !</h2> <br />
 		<h2>New Post</h2>
 		<form action="index.php" method="post">
 			<ul class="form">
@@ -69,5 +100,8 @@ include('connection.php');
 				<p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
 			</div>
 		</div>
+
+	<?php } ?>
+
 	</body>
 </html>
